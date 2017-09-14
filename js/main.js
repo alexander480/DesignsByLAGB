@@ -10,25 +10,9 @@
 var homeDiv = $("#home");
 var lastPage = "home";
 
-var profile = Array();
-var portfolio = Array();
-
 init();
-voiceCmd();
 
 function init() {
-    firebase.database().ref("profile").once("value").then(function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
-            profile.push(firebase.database().ref("profile/" + childSnapshot.key));
-        });
-    });
-
-    firebase.database().ref("portfolio").once("value").then(function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
-            portfolio.push(firebase.database().ref("portfolio/" + childSnapshot.key));
-        });
-    });
-
 
     var logoImage = $("#logoImage");
 
@@ -37,43 +21,44 @@ function init() {
     var contactBlock = $("#contactBlock");
     var aboutBlock = $("#aboutBlock");
 
+    voiceCmd();
 
     logoImage.click(function() {
 
     });
 
     profileBlock.click(function() {
-        profile1();
+        profile();
     });
     portfolioBlock.click(function() {
-        portfolio1();
+        portfolio();
     });
     contactBlock.click(function() {
-        contact1();
+        contact();
     });
     aboutBlock.click(function() {
-        about1();
+        about();
     });
 }
 
 function voiceCmd() {
-  if (annyang)
-  {
+  if (annyang) {
+
       var commands =
       {
-        'home': function() { home1(); },
-        'profile': function() { profile1(); },
-        'portfolio': function() { portfolio1(); },
-        'contact': function() { contact1(); },
-        'about': function() { about1(); },
+        'home': function() { home(); },
+        'profile': function() { profile(); },
+        'portfolio': function() { portfolio(); },
+        'contact': function() { contact(); },
+        'about': function() { about(); },
         'back': function()
         {
-          if (lastPage == "home") { home1(); }
-          else if (lastPage == "profile") { profile1(); }
-          else if (lastPage == "portfolio") { portfolio1(); }
-          else if (lastPage == "contact") { contact1(); }
-          else if (lastPage == "about") { about1(); }
-          else { home1(); }
+          if (lastPage == "home") { home(); }
+          else if (lastPage == "profile") { profile(); }
+          else if (lastPage == "portfolio") { portfolio(); }
+          else if (lastPage == "contact") { contact(); }
+          else if (lastPage == "about") { about(); }
+          else { home(); }
         }
       };
 
@@ -82,7 +67,7 @@ function voiceCmd() {
     }
 }
 
-function home1() {
+function home() {
   var html =
     '<div class="div-block-8">'+
     '<img class="image" id="logoImage" src="images/logo.png" width="290"></div>'+
@@ -109,39 +94,90 @@ function home1() {
   homeDiv.fadeIn("slow");
 }
 
-function profile1() {
-    var html =
-        '<img class="image-4" id="profileLogo" src="images/ProHeading.png" width="225">'+
 
-        '<div class="div-block-7" id="teamBlock">'+
-            '<h1 class="heading-4">Our Team</h1>'+
-        '</div>'+
 
-        '<div class="divteam" id="styleBlock">'+
-            '<h1 class="heading-2">Our Style</h1>'+
-        '</div>';
+function profile() {
 
-    homeDiv.hide();
-    homeDiv.html(html);
-    homeDiv.fadeIn("slow");
+    var people = Array();
+
+    firebase.database().ref("profile").once("value").then(function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+            var data = childSnapshot.val();
+
+            var person = { name: data.name, picture: data.picture, position: data.position, bio: data.bio };
+            people.push(person);
+        });
+    });
+
+    for person in people
+    {
+        var name = person.name;
+        var picture = person.picture;
+        var position = person.position;
+        var bio = person.bio;
+
+        var html =
+          '<img class="image-13" src="' + picture + '" width="161">' +
+          '<h6 class="h6">' + name + '</h6>';
+
+        var proBlock = document.createElement('DIV');
+            proBlock.className = "divportblock";
+            proBlock.innerHTML = html;
+
+        homeDiv.append(proBlock);
+
+        proBlock.addEventListener("click", function() {
+            console.log( name + "Has Been Clicked");
+        });
+    }
 }
 
-function portfolio1() {
-    var html =
-        '<img class="image-5" id="portfolioLogo" src="images/Portfolio-Heading.png" width="267">'+
-        '<div class="div-block-7" id="websitesBlock">'+
-            '<h1 class="heading-4">Websites</h1>'+
-        '</div>'+
-        '<div class="divteam" id="applicationsBlock">'+
-            '<h1 class="heading-2">Applications</h1>'+
-        '</div>';
+function portfolio() {
 
-    homeDiv.hide();
-    homeDiv.html(html);
-    homeDiv.fadeIn("slow");
+    var projects = Array();
+
+    firebase.database().ref("portfolio").once("value").then(function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+            var data = childSnapshot.val();
+            var pics = Array();
+
+            childSnapshot.child('pictures').forEach(function(link){
+                var pic = link.val();
+                pics.push(pic);
+            })
+
+            var project = { name: data.name, pictures: pics, link: data.link, info: data.info, type: data.type};
+            projects.push(project);
+        });
+    });
+
+    for project in projects {
+
+        var name = project.name;
+        var pictures = project.pictures;
+        var link = project.link;
+        var info = project.info;
+        var type = project.type;
+
+        if ( type == "app" ) { link = ""; }
+
+        var html =
+          '<img class="image-13" src="' + pictures[0] + '" width="161">' +
+          '<h6 class="h6">' + name + '</h6>';
+
+        var portBlock = document.createElement('DIV');
+            portBlock.className = "divportblock";
+            portBlock.innerHTML = html;
+
+        homeDiv.append(portBlock);
+
+        portBlock.addEventListener("click", function() {
+            console.log( name + "Has Been Clicked");
+        });
+    }
 }
 
-function contact1() {
+function contact() {
     var html =
         '<img class="image-6" id="contactLogo" src="images/Contact-HEading.png" width="236">'+
         '<div class="div-block-7" id="callBlock">'+
@@ -156,7 +192,7 @@ function contact1() {
     homeDiv.fadeIn("slow");
 }
 
-function about1() {
+function about() {
     var html =
             '<img class="image-6" id="contactLogo" src="images/Contact-HEading.png" width="236">'+
             '<div class="div-block-7" id="callBlock">'+
