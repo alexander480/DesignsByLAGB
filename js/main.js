@@ -94,8 +94,6 @@ function home() {
   homeDiv.fadeIn("slow");
 }
 
-
-
 function profile() {
 
     var people = Array();
@@ -159,8 +157,6 @@ function portfolio() {
         var info = project.info;
         var type = project.type;
 
-        if ( type == "app" ) { link = ""; }
-
         var html =
           '<img class="image-13" src="' + pictures[0] + '" width="161">' +
           '<h6 class="h6">' + name + '</h6>';
@@ -172,7 +168,7 @@ function portfolio() {
         homeDiv.append(portBlock);
 
         portBlock.addEventListener("click", function() {
-            console.log( name + "Has Been Clicked");
+            // TODO: Create Portfolio Content Function
         });
     }
 }
